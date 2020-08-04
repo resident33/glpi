@@ -1,0 +1,39 @@
+pipeline {
+
+    parameters {
+        string(name: 'name', defaultValue: 'hello.geoguard@gmail.com', description: 'Email new user')
+        string(name: 'realname', defaultValue: 'surname', description: 'Enter surname')
+        string(name: 'firstname', defaultValue: 'first name', description: 'Enter first name')
+        }
+
+
+    stages {
+
+        stage ('Generating Fille'){
+            steps{
+
+                sh "sudo touch /var/www/glpi/add_glpi_user.php"
+                sh "echo '\$name=${params.name}' >> /var/www/glpi/add_glpi_user.php "
+                sh "echo '\$realname=${params.realname}' >> /var/www/glpi/add_glpi_user.php "
+                sh "echo '\$firstname=${params.firstname}' >> /var/www/glpi/add_glpi_user.php "
+                print "Generating Fille: Done"
+            }
+        }
+
+        stage ('Build'){
+            steps{
+                sh "curl -X POST  http://glpi.geoguard.com/user_add_apirest.php"
+                print "Build: Done"
+            }
+        }
+
+        stage ('Cleaning'){
+            steps{
+                sh "sudo rm -R /var/www/glpi/add_glpi_user.php"
+                print 'Cleaning: Done'
+
+            }
+         }
+      }
+
+  }
